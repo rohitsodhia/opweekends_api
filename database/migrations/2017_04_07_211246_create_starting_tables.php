@@ -30,8 +30,8 @@ class CreateStartingTables extends Migration
 			$table->string('name');
 			$table->string('slug')->unique();
             $table->timestamps();
-			$table->dateTime('start');
-			$table->dateTime('end');
+			$table->dateTime('start')->nullable();
+			$table->dateTime('end')->nullable();
 			$table->text('blocks');
 			$table->boolean('sessionSubmission')->default(true);
         });
@@ -45,21 +45,27 @@ class CreateStartingTables extends Migration
 
 		Schema::create('sessions', function (Blueprint $table) {
 			$table->increments('sessionId');
+			$table->integer('orgId')->unsigned();
 			$table->string('title');
 			$table->integer('ownerId')->unsigned();
 			$table->string('gm');
 			$table->integer('typeId')->unsigned();
 			$table->text('description');
+			$table->text('proposedStart')->nullable();
 			$table->dateTime('start');
 			$table->dateTime('end');
-			$table->integer('numPlayers')->unsigned();
-			$table->integer('spotsFilled')->unsigned();
+			$table->integer('numSeats')->unsigned();
+			$table->integer('seatsFilled')->unsigned();
+			$table->boolean('approved');
             $table->timestamps();
         });
 
 		Schema::create('sessionTypes', function (Blueprint $table) {
-			$table->increments('sessionId');
+			$table->increments('typeId');
+			$table->integer('orgId');
 			$table->string('type');
+			$table->timestamps();
+			$table->index('orgId');
         });
     }
 

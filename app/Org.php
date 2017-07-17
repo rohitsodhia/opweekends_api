@@ -19,12 +19,16 @@ class Org extends Model
 		'sessionSubmission' => 'boolean',
 	];
 
-	public function getBlocksAttribute($value) {
+/*	public function getBlocksAttribute($value) {
 		return unserialize($value);
 	}
 
 	public function setBlocksAttribute($value) {
 		$this->attributes['blocks'] = serialize($value);
+	}*/
+
+	public function sessionTypes() {
+		return $this->hasMany('App\SessionType', 'orgId');
 	}
 
 	public function users() {

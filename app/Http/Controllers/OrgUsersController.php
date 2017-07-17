@@ -11,14 +11,10 @@ class OrgUsersController extends Controller
 
 	public function index(Request $request, $org)
 	{
-		if (is_numeric($org)) {
-			$org = Org::find((int) $org);
-		} else {
-			$org = Org::where('slug', $org)->first();
-		}
+		$org = findOrg($org);
 
 		if (!$org) {
-			return response()->json(['success' => false, 'errors' => ['invalidOrg' => 'Invalid organization Id/slug']]);
+			return ['success' => false, 'errors' => ['invalidOrg']];
 		} else {
 			$users = [];
 			foreach ($org->users as $user) {
@@ -33,7 +29,7 @@ class OrgUsersController extends Controller
 				'success' => true,
 				'users' => $users,
 			];
-			return response()->json($response);
+			return $response;
 		}
 	}
 
@@ -60,7 +56,7 @@ class OrgUsersController extends Controller
 		}
 
 		if (count($errors)) {
-			return response()->json(['success' => false, 'errors' => $errors]);
+			return ['success' => false, 'errors' => $errors];
 		}
 
 		$org = new Org;
@@ -68,7 +64,7 @@ class OrgUsersController extends Controller
 		$org->slug = $slug;
 		$org->save();
 
-		return response()->json(['success' => true, 'orgId' => $org->orgId]);
+		return ['success' => true, 'orgId' => $org->orgId];
 	}
 
 }

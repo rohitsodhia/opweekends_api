@@ -18,14 +18,15 @@ class UserController extends Controller
 	}
 
 	public function store(Request $request) {
+		$data = $request->json();
 		if (
 			!$this->currentUser->admin &&
 			(
 				(
-					$request->has('org') &&
-					!$this->currentUser->isOrgAdmin($request->org['orgId'])
+					$data->has('org') &&
+					!$this->currentUser->isOrgAdmin($data->get('org')['orgId'])
 				) ||
-				!$request->has('org')
+				!$data->has('org')
 			)
 		) {
 			return [
@@ -36,18 +37,18 @@ class UserController extends Controller
 			];
 		}
 
-		$email = $request->email;
-		if ($request->has('org')) {
+		$email = $data->get('email');
+		if ($data->has('org')) {
 			$org = [
-				'orgId' => (int) $request->org['orgId'],
-				'admin' => (bool) $request->org['admin']
+				'orgId' => (int) $data->get('org')['orgId'],
+				'admin' => (bool) $data->get('org')['admin']
 			];
 			$password = '';
 		} else {
-			$password = $request->password;
+			$password = $data->get('password');
 		}
-		$name = $request->name;
-		$admin = $request->has('admin') ? (bool) $request->admin : false;
+		$name = $data->get('name');
+		$admin = $data->has('admin') ? (bool) $data->get('admin') : false;
 
 		if (strlen($email) === 0 || strlen($name) === 0) {
 			$errors = [];
@@ -115,17 +116,18 @@ class UserController extends Controller
 	}
 
 	public function activateAccount(Request $request) {
+		$data = $request->json();
 		if (
-			!$request->has('email') || strlen($request->email) === 0 ||
-			!$request->has('hash') || strlen($request->hash) === 0
+			!$data->has('email') || strlen($data->get('email')) === 0 ||
+			!$data->has('hash') || strlen($data->get('hash')) === 0
 		) {
 			return [
 				'success' => false,
 				'errors' => ['invalidData']
 			];
 		}
-		$email = $request->email;
-		$hash = $request->hash;
+		$email = $data->get('email');
+		$hash = $data->get('hash');
 		$user = User::where('email', $email)->first();
 		if ($user && $user->activatedOn === null && $user->getActivationHash() === $hash) {
 			$user->activatedOn = \Carbon\Carbon::now();
@@ -145,12 +147,13 @@ class UserController extends Controller
 	}
 
 	public function setPassword(Request $request) {
+		$data = $request->json();
 		if (
 			!$this->currentUser->get() &&
 			(
-				!$request->has('auth') ||
-				!isset($request->auth['email']) || strlen($request->auth['email']) === 0 ||
-				!isset($request->auth['hash']) || strlen($request->auth['hash']) === 0
+				!$data->has('auth') ||
+				!isset($data->get('auth')['email']) || strlen($data->get('auth')['email']) === 0 ||
+				!isset($data->get('auth')['hash']) || strlen($data->get('auth')['hash']) === 0
 			)
 		) {
 			return [
@@ -159,19 +162,19 @@ class UserController extends Controller
 			];
 		}
 
-		if (!$request->has('password') || strlen($request->password) === 0) {
+		if (!$data->has('password') || strlen($data->get('password')) === 0) {
 			return [
 				'success' => false,
 				'errors' => ['noPassword']
 			];
 		}
-		$password = $request->password;
+		$password = $data->get('password');
 
 		if ($this->currentUser->get()) {
 
 		} else {
-			$email = $request->auth['email'];
-			$hash = $request->auth['hash'];
+			$email = $data->get('auth')['email'];
+			$hash = $data->get('auth')['hash'];
 			$user = User::where('email', $email)->first();
 			if ($user && $user->getActivationHash() === $hash) {
 				$user->setPassword($password);
@@ -189,8 +192,9 @@ class UserController extends Controller
 	}
 
 	public function toggleOrgAdmin(Request $request) {
-		$userId = (int) $request->userId;
-		$orgId = (int) $request->orgId;
+		$data = $request->json();
+		$userId = (int) $data->get('userId');
+		$orgId = (int) $data->get('orgId');
 		if ($userId <= 0 || $orgId <= 0) {
 			return [
 				'success' => false,

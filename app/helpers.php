@@ -6,3 +6,13 @@ function generateSlug($value) {
 
 	return $value;
 }
+
+function findOrg($org) {
+	if (is_numeric($org)) {
+		$org = App\Org::find((int) $org);
+	} else {
+		$org = App\Org::where('slug', $org)->first();
+	}
+
+	return $org;
+}

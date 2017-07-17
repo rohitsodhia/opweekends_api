@@ -27,6 +27,10 @@ $app->get('/', function () use ($app) {
 
 $app->group(['prefix' => 'auth'], function () use ($app) {
 	$app->get('/validateCredentials', 'AuthController@validateCredentials');
+	$app->get('/validateToken', [
+		'middleware' => 'auth:orgAdmin',
+		'uses' => 'AuthController@validateToken'
+	]);
 	$app->get('/orgMemberships/{userId:\d+}', 'AuthController@orgMemberships');
 	$app->get('/validateMembership', 'AuthController@validateMembership');
 });
@@ -63,8 +67,23 @@ $app->group(['prefix' => 'orgs'], function () use ($app) {
 		'uses' => 'OrgController@update'
 	]);
 
-	$app->get('/{org}/users', [
-		'middleware' => 'auth',
-		'uses' => 'OrgUsersController@index'
-	]);
+	$app->group(['prefix' => '{org}'], function () use ($app) {
+		$app->get('users', [
+			'middleware' => 'auth',
+			'uses' => 'OrgUsersController@index'
+		]);
+
+		$app->group(['prefix' => 'types', 'middleware' => 'auth'], function () use ($app) {
+			$app->get('/', 'SessionTypesController@index');
+			$app->post('/', 'SessionTypesController@store');
+			$app->patch('/{typeId:\d+}', 'SessionTypesController@update');
+			$app->delete('/{typeId:\d+}', 'SessionTypesController@destroy');
+		});
+	});
+});
+
+$app->group(['prefix' => 'sessions', 'middleware' => 'auth'], function () use ($app) {
+	$app->get('/', 'SessionsController@index');
+	$app->post('/', 'SessionsController@store');
+	$app->patch('/{typeId:\d+}', 'SessionsController@update');
 });

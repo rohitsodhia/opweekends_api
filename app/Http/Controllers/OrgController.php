@@ -11,14 +11,10 @@ class OrgController extends Controller
 
 	public function show(Request $request, $org)
 	{
-		if (is_numeric($org)) {
-			$org = Org::find((int) $org);
-		} else {
-			$org = Org::where('slug', $org)->first();
-		}
+		$org = findOrg($org);
 
 		if (!$org) {
-			return ['success' => false, 'errors' => ['invalidOrg' => 'Invalid organization Id/slug']];
+			return ['success' => false, 'errors' => ['invalidOrg']];
 		} else {
 			$response = [
 				'success' => true,
@@ -26,6 +22,7 @@ class OrgController extends Controller
 					'orgId' => $org->orgId,
 					'name' => $org->name,
 					'slug' => $org->slug,
+					'sessionSubmission' => $org->sessionSubmission
 				],
 			];
 			if ($request->has('full') && $request->full === 'true') {
@@ -36,7 +33,7 @@ class OrgController extends Controller
 			if ($request->has('hasPermission') && $request->hasPermission === 'true') {
 				$currentUser = app('App\CurrentUser')->get();
 				if ($currentUser) {
-					$permission = AuthController::checkMembership($currentUser->userId, $org->orgId);
+					$permission = AuthController::checkMembership($org->orgId, $currentUser->userId);
 					$response['permission'] = $permission;
 				} else {
 					$response['permission'] = false;
@@ -48,8 +45,9 @@ class OrgController extends Controller
 
 	public function store(Request $request)
 	{
+		$data = $request->json();
 		$errors = [];
-		$name = trim($request->input('name'));
+		$name = trim($data->get('name'));
 		if (strlen($name) === 0) {
 			$errors['noName'] = 'No name provided';
 		}
@@ -57,7 +55,7 @@ class OrgController extends Controller
 		if ($nameChars < 3) {
 			$errors['shortName'] = 'Name too short (3 char minimum)';
 		}
-		$slug = trim($request->input('slug'));
+		$slug = trim($data->get('slug'));
 		if (strlen($slug) === 0) {
 			$slug = $name;
 		}

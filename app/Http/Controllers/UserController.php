@@ -135,6 +135,7 @@ class UserController extends Controller
 			$response = [
 				'success' => true,
 			];
+			var_dump($user->password); return 1;
 			if ($user->password === '') {
 				$response['setPass'] = true;
 			}

@@ -40,7 +40,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
 
 	public function setPassword($password) {
-		$this->password = password_hash($password, PASSWORD_DEFAULT);
+		if (strlen($password) === 0) {
+			$this->password = '';
+		} else {
+			$this->password = password_hash($password, PASSWORD_DEFAULT);
+		}
 	}
 
 	public function orgs() {
@@ -54,7 +58,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 	}
 
 	public function getActivationLink($orgSlug = null) {
-		return '//' . eng('APP_DOMAIN') . '/account/activate/?e=' . $this->email . '&h=' . $this->getActivationHash() . ($orgSlug ? '&o=' . $orgSlug : '');
+		return '//' . env('APP_DOMAIN') . '/account/activate/?e=' . $this->email . '&h=' . $this->getActivationHash() . ($orgSlug ? '&o=' . $orgSlug : '');
 	}
 
 	public function isOrgAdmin($orgId) {

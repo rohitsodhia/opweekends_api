@@ -115,6 +115,31 @@ class UserController extends Controller
 		];
 	}
 
+	public function activationLink(Request $request) {
+		if (
+			!$request->has('org') || strlen($request->get('org')) === 0 ||
+			(
+				(!$request->has('email') || strlen($request->get('email')) === 0) &&
+				(!$request->has('userId') || (int) $request->get('userId') <= 0)
+			)
+		) {
+			return [
+				'success' => false,
+				'errors' => ['invalidData']
+			];
+		}
+
+		if ($request->has('userId')) {
+			$user = User::find((int) $request->get('userId'));
+		} else {
+			$user = User::where('email', $request->get('email'))->first();
+		}
+		return [
+			'userId' => $user->userId,
+			'link' => $user->getActivationLink($request->get('org'))
+		];
+	}
+
 	public function activateAccount(Request $request) {
 		$data = $request->json();
 		if (
@@ -135,7 +160,6 @@ class UserController extends Controller
 			$response = [
 				'success' => true,
 			];
-			var_dump($user->password); return 1;
 			if ($user->password === '') {
 				$response['setPass'] = true;
 			}

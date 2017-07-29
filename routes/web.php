@@ -36,6 +36,7 @@ $app->group(['prefix' => 'auth'], function () use ($app) {
 });
 
 $app->group(['prefix' => 'users'], function () use ($app) {
+	$app->get('/activationLink', 'UserController@activationLink');
 	$app->post('/activate', 'UserController@activateAccount');
 	$app->post('/setPassword', 'UserController@setPassword');
 

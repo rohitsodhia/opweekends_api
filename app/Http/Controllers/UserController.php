@@ -216,6 +216,35 @@ class UserController extends Controller
 		}
 	}
 
+	public function updatePassword(Request $request) {
+		$data = $request->json();
+		if ($this->currentUser->loggedIn()) {
+			return [
+				'success' => false,
+				'errors' => ['notLoggedIn']
+			];
+		}
+
+		if (!$data->has('password') || strlen($data->get('password')) === 0) {
+			return [
+				'success' => false,
+				'errors' => ['noPassword']
+			];
+		}
+		$password = $data->get('password');
+
+		if (strlen($password) === 0) {
+
+		} else {
+			$user = $this->currentUser->get();
+			$user->setPassword($password);
+			$user->save();
+			return [
+				'success' => true,
+			];
+		}
+	}
+
 	public function toggleOrgAdmin(Request $request) {
 		$data = $request->json();
 		$userId = (int) $data->get('userId');

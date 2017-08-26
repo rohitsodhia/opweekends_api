@@ -12,7 +12,8 @@
 */
 
 $app->get('/', function () use ($app) {
-	$now = time();
+	var_dump(\App\User::find(1)->getActivationLink());
+	// $now = time();
 	// var_dump(JWTFactory::make([
 	// 	'iss' => 'opweekends.local',
     //     'iat' => $now,
@@ -39,6 +40,10 @@ $app->group(['prefix' => 'users'], function () use ($app) {
 	$app->get('/activationLink', 'UserController@activationLink');
 	$app->post('/activate', 'UserController@activateAccount');
 	$app->post('/setPassword', 'UserController@setPassword');
+	$app->post('/updatePassword', [
+		'middleware' => 'auth',
+		'uses' => 'UserController@updatePassword'
+	]);
 
 	$app->post('/toggleOrgAdmin', [
 		'middleware' => 'auth:orgAdmin',

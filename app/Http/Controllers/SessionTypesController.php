@@ -40,7 +40,7 @@ class SessionTypesController extends Controller
 		if (!$org) {
 			return ['success' => false, 'errors' => ['invalidOrg']];
 		} else {
-			if (AuthController::isOrgAdmin($org->orgId)) {
+			if (!AuthController::isOrgAdmin($org->orgId)) {
 				return ['success' => false, 'errors' => ['unauthorized']];
 			}
 

@@ -7,7 +7,7 @@ use App\User;
 class CurrentUser
 {
 
-	protected $user;
+	protected $user = null;
 
 	public function __construct()
 	{
@@ -29,5 +29,9 @@ class CurrentUser
 
 	public function isOrgAdmin($orgId) {
 		return $this->user->isOrgAdmin($orgId);
+	}
+
+	public function loggedIn() {
+		return $this->user === null;
 	}
 }

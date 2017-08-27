@@ -51,6 +51,7 @@ class CreateStartingTables extends Migration
 			$table->string('gm');
 			$table->integer('typeId')->unsigned();
 			$table->text('description');
+			$table->string('location', 255);
 			$table->text('proposedStart')->nullable();
 			$table->dateTime('start');
 			$table->dateTime('end');

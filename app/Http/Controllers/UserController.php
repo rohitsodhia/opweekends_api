@@ -101,7 +101,7 @@ class UserController extends Controller
 			include(base_path() . '/resources/emails/newOrgUser.php');
 			$email = ob_get_contents();
 			ob_end_clean();
-			mail($email, "You've been registered to {$emailVars['org']}", $email, "Content-type: text/html\r\nFrom: OpWeeknds <contact@opweekends.com>");
+			mail($user->email, "You've been registered to {$emailVars['org']}", $email, "Content-type: text/html\r\nFrom: OpWeeknds <contact@opweekends.com>");
 			$userReturn['memberships'][$org->orgId] = [
 				'member' => true,
 				'admin' => $org['admin']

@@ -58,7 +58,8 @@ class CreateStartingTables extends Migration
 			$table->integer('numSeats')->unsigned();
 			$table->integer('seatsFilled')->unsigned();
 			$table->boolean('approved');
-            $table->timestamps();
+			$table->timestamps();
+			$table->softDeletes();
         });
 
 		Schema::create('sessionTypes', function (Blueprint $table) {

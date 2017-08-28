@@ -21,7 +21,9 @@ class SessionsController extends Controller
 		if (!$org) {
 			return ['success' => false, 'errors' => ['invalidOrg']];
 		} else {
-			$rawSessions = Session::where('orgId', $org->orgId);
+			$rawSessions = Session::where([
+				['orgId', $org->orgId],
+			]);
 			if ($request->has('approved')) {
 				$rawSessions->where('approved', $request->get('approved') === 'true');
 			}
@@ -218,7 +220,7 @@ class SessionsController extends Controller
 		if (!$session) {
 			return ['success' => false, 'errors' => ['invalidSession']];
 		} else {
-			if (!AuthController::isOrgAdmin($org->orgId)) {
+			if (!AuthController::isOrgAdmin($session->orgId)) {
 				return ['success' => false, 'errors' => ['unauthorized']];
 			}
 

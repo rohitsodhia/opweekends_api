@@ -92,4 +92,5 @@ $app->group(['prefix' => 'sessions', 'middleware' => 'auth'], function () use ($
 	$app->get('/', 'SessionsController@index');
 	$app->post('/', 'SessionsController@store');
 	$app->patch('/{typeId:\d+}', 'SessionsController@update');
+	$app->delete('/{typeId:\d+}', 'SessionsController@destroy');
 });

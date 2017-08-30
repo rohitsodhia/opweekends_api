@@ -15,22 +15,24 @@ class OrgUsersController extends Controller
 
 		if (!$org) {
 			return ['success' => false, 'errors' => ['invalidOrg']];
-		} else {
-			$users = [];
-			foreach ($org->users as $user) {
-				$users[$user->userId] = [
-					'userId' => $user->userId,
-					'email' => $user->email,
-					'name' => $user->name,
-					'admin' => (bool) $user->pivot->admin
-				];
-			}
-			$response = [
-				'success' => true,
-				'users' => $users,
-			];
-			return $response;
+		} elseif (!AuthController::isOrgAdmin($org->orgId)) {
+			return ['success' => false, 'errors' => ['unauthorized']];
 		}
+
+		$users = [];
+		foreach ($org->users as $user) {
+			$users[$user->userId] = [
+				'userId' => $user->userId,
+				'email' => $user->email,
+				'name' => $user->name,
+				'admin' => (bool) $user->pivot->admin
+			];
+		}
+		$response = [
+			'success' => true,
+			'users' => $users,
+		];
+		return $response;
 	}
 
 	public function store(Request $request)

@@ -24,7 +24,9 @@ class SessionsController extends Controller
 			$rawSessions = Session::where([
 				['orgId', $org->orgId],
 			]);
-			if ($request->has('approved')) {
+			if (!AuthController::isOrgAdmin($org->orgId)) {
+				$rawSessions->where('approved', true);
+			} elseif ($request->has('approved')) {
 				$rawSessions->where('approved', $request->get('approved') === 'true');
 			}
 			$rawSessions = $rawSessions->get();
@@ -33,6 +35,7 @@ class SessionsController extends Controller
 				$sessions[] = [
 					'sessionId' => $session->sessionId,
 					'title' => $session->title,
+					'game' => $session->game,
 					'owner' => [
 						'userId' => $session->owner->userId,
 						'name' => $session->owner->name

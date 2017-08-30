@@ -26,8 +26,8 @@ class OrgController extends Controller
 				],
 			];
 			if ($request->has('full') && $request->full === 'true') {
-				$response['org']['start'] = $org['start']->timestamp > 0 ? $org['start']->timestamp : null;
-				$response['org']['end'] = $org['end']->timestamp > 0 ? $org['end']->timestamp : null;
+				$response['org']['start'] = isset($org['start']) && $org['start']->timestamp > 0 ? $org['start']->timestamp : null;
+				$response['org']['end'] = isset($org['end']) && $org['end']->timestamp > 0 ? $org['end']->timestamp : null;
 				$response['org']['blocks'] = $org['blocks'] ? $org['blocks'] : null;
 			}
 			if ($request->has('hasPermission') && $request->hasPermission === 'true') {
@@ -81,6 +81,11 @@ class OrgController extends Controller
 	public function update(Request $request, $orgId) {
 		$data = $request->json();
 		$org = Org::find((int) $orgId);
+		if (!$org) {
+			return ['success' => false, 'errors' => ['invalidOrg']];
+		} elseif (!AuthController::isOrgAdmin($org->orgId)) {
+			return ['success' => false, 'errors' => ['unauthorized']];
+		}
 		$changed = false;
 		if ($data->has('start')) {
 			$org->start = $data->get('start');

@@ -46,7 +46,8 @@ class CreateStartingTables extends Migration
 		Schema::create('sessions', function (Blueprint $table) {
 			$table->increments('sessionId');
 			$table->integer('orgId')->unsigned();
-			$table->string('title');
+			$table->string('title', 255);
+			$table->string('game', 255);
 			$table->integer('ownerId')->unsigned();
 			$table->string('gm');
 			$table->integer('typeId')->unsigned();
